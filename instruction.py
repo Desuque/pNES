@@ -17,9 +17,27 @@ class Instruction(ABC):
         pass
 
 
-# Status instructions
+# ADC (ADd with Carry)
 
-class ADCInstruction(Instruction):
+class ADCInmInstruction(Instruction):
+    adc_inst = [
+"""
+Affects Flags: S V Z C
+
+MODE           SYNTAX       HEX LEN TIM
+Immediate     ADC #$44      $69  2   2
+Zero Page     ADC $44       $65  2   3
+Zero Page,X   ADC $44,X     $75  2   4
+Absolute      ADC $4400     $6D  3   4
+Absolute,X    ADC $4400,X   $7D  3   4+
+Absolute,Y    ADC $4400,Y   $79  3   4+
+Indirect,X    ADC ($44,X)   $61  2   6
+Indirect,Y    ADC ($44),Y   $71  2   5+
+
++ add 1 cycle if page boundary crossed
+"""
+    ]
+
     # TODO: Instruction length
     def execute(self, cpu, data_bytes):
         # TODO: Overflow in bit 7, to code carry flag
@@ -50,7 +68,7 @@ class STAAbsInstruction(Instruction):
         value_to_store = cpu.a_reg
 
         memory_owner = cpu.get_memory_owner(memory_address)
-        memory_owner.set_bytes(memory_address, value_to_store)
+        memory_owner.set(memory_address, value_to_store)
 
         print(memory_address)
 

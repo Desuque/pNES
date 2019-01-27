@@ -11,8 +11,15 @@ ZERO_BYTES = bytes.fromhex('00')
 
 class CPU(object):
     def __init__(self, ram: RAM, ppu: PPU):
+
         self.ram = ram
         self.ppu = ppu
+
+        # Memory Owners
+        self.memory_owners = [  # type: List[MemoryOwnerMixin]
+            self.ram,
+            self.ppu
+        ]
 
         # Counter registers
         self.pc_reg = None
@@ -38,10 +45,14 @@ class CPU(object):
         }
 
     def get_memory_owner(self, memory_position: int) -> MemoryOwnerMixin:
-        if RAM_START <= memory_position <= RAM_END:
-            return self.ram
-        elif PPU_START <= memory_position <= PPU_END:
-            return self.ppu
+        if self.rom.memory_start_location <= memory_position <= self.rom.memory_end_location:
+            return self.rom
+
+        for owner in self.memory_owners:
+            if owner.memory_start_location <= memory_position <= owner.memory_end_location:
+                return owner
+
+        raise Exception('Memory owner doesnt exists')
 
     def a_reg_is_zero(self):
         return self.a_reg == ZERO_BYTES
@@ -60,11 +71,11 @@ class CPU(object):
         #  SP = $FD
 
         self.p_reg = Status()
-        self.a_reg = bytes.fromhex('00')
-        self.x_reg = bytes.fromhex('00')
-        self.y_reg = bytes.fromhex('00')
+        self.a_reg = 0
+        self.x_reg = 0
+        self.y_reg = 0
 
-        self.sp_reg = bytes.fromhex('FD')
+        self.sp_reg = 0xFD
 
         # TODO: IMPLEMENTAR LA MEMORIA RAM!!! FALTA MANDAR A CERO
         # TODO: CIERTOS LUGARES DE LA MEMORIA
@@ -76,7 +87,7 @@ class CPU(object):
 
         while self.running:
             # Get the current byte at pc
-            identifier_byte = rom.get_bytes(self.pc_reg)
+            identifier_byte = rom.get(self.pc_reg)
 
             # Turn the byte into a instruction
             instruction_class = self.instruction_mapping.get(identifier_byte, None)
@@ -89,7 +100,7 @@ class CPU(object):
 
             # Get the correct amount of data bytes
             num_data_bytes = instruction.instruction_length - 1
-            data_bytes = rom.get_bytes(self.pc_reg + 1, num_data_bytes)
+            data_bytes = rom.get(self.pc_reg + 1, num_data_bytes)
 
             instruction.execute(self, data_bytes)
 

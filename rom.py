@@ -1,4 +1,3 @@
-from memory import MemoryOwnerMixin
 from typing import List
 
 KB = 1024
@@ -16,7 +15,9 @@ KB = 1024
 '''
 
 
-class ROM(MemoryOwnerMixin, object):
+class ROM(object):
+    memory_start_location = 0x4020
+    memory_end_location = 0xFFFF
 
     def __init__(self, rom_bytes: bytes):
         # Flag trainer is the second bit
@@ -34,5 +35,6 @@ class ROM(MemoryOwnerMixin, object):
     def get_memory(self) -> List[bytes]:
         return self.rom_bytes
 
-    def set_bytes(self, position, value):
-        raise Exception('Trying to write in Read Only Memory')
+    def get(self, position: int, size: int = 1) -> bytes:
+            return self.get_memory()[position:position+size]
+
