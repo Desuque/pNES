@@ -1,19 +1,10 @@
 from abc import ABC, abstractmethod
 
-import struct
-
 
 class Instruction(ABC):
-    def __init__(self, identifier_byte: bytes):
-        self.identifier_byte = identifier_byte
-
-    @property
-    def instruction_length(self):
-        return 1
 
     @abstractmethod
-    def execute(self):
-        print('Identifier byte: ', self.identifier_byte)
+    def execute(self, cpu):
         pass
 
 
@@ -39,7 +30,7 @@ Indirect,Y    ADC ($44),Y   $71  2   5+
     ]
 
     # TODO: Instruction length
-    def execute(self, cpu, data_bytes):
+    def execute(self, cpu):
         # TODO: Overflow in bit 7, to code carry flag
         if cpu.a_reg_is_zero():
             cpu.p_reg.zero_bit = True
@@ -50,8 +41,8 @@ Indirect,Y    ADC ($44),Y   $71  2   5+
 class LDAInmInstruction(Instruction):
     instruction_length = 2
 
-    def execute(self, cpu, data_bytes):
-        cpu.a_reg = data_bytes[0]
+    def execute(self, cpu):
+        cpu.a_reg = cpu.address
 
         if cpu.a_reg_is_zero():
             cpu.p_reg.zero_bit = True
@@ -61,10 +52,9 @@ class LDAInmInstruction(Instruction):
 
 
 class STAAbsInstruction(Instruction):
-    instruction_length = 3
 
-    def execute(self, cpu, data_bytes):
-        memory_address = int.from_bytes(data_bytes, byteorder='little')
+    def execute(self, cpu):
+        memory_address = int.from_bytes(cpu.address, byteorder='little')
         value_to_store = cpu.a_reg
 
         memory_owner = cpu.get_memory_owner(memory_address)
@@ -90,47 +80,47 @@ SED (SEt Decimal)              $F8
 class CLCInstruction(Instruction):
     instruction_length = 1
 
-    def execute(self, cpu, data_bytes):
+    def execute(self, cpu):
         cpu.p_reg.carry_bit = False
 
 
 class SECInstruction(Instruction):
     instruction_length = 1
 
-    def execute(self, cpu, data_bytes):
+    def execute(self, cpu):
         cpu.p_reg.carry_bit = True
 
 
 class CLIInstruction(Instruction):
     instruction_length = 1
 
-    def execute(self, cpu, data_bytes):
+    def execute(self, cpu):
         cpu.p_reg.interrupt_bit = False
 
 
-class SEIInstruction(Instruction):
-    instruction_length = 1
+class SEI(Instruction):
 
-    def execute(self, cpu, data_bytes):
+    def execute(self, cpu):
+        print("entre desde la matriz")
         cpu.p_reg.interrupt_bit = True
 
 
 class CLVInstruction(Instruction):
     instruction_length = 1
 
-    def execute(self, cpu, data_bytes):
+    def execute(self, cpu):
         cpu.p_reg.overflow_bit = False
 
 
 class CLDInstruction(Instruction):
     instruction_length = 1
 
-    def execute(self, cpu, data_bytes):
+    def execute(self, cpu):
         cpu.p_reg.decimal_bit = False
 
 
 class SEDInstruction(Instruction):
     instruction_length = 1
 
-    def execute(self, cpu, data_bytes):
+    def execute(self, cpu):
         cpu.p_reg.decimal_bit = True

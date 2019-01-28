@@ -30,8 +30,6 @@ def main():
         cpu.start_up()
         cpu.run_rom(rom)
 
-        print("Hola mundo!, se viene un emulador interesante :D")
-        print("Cambio esta linea solo para ver si GitHub quedo bien configurado")
 
 if __name__ == '__main__':
     main()
