@@ -63,6 +63,8 @@ class STAAbsInstruction(Instruction):
         print(memory_address)
 
 # Status instructions
+
+
 """
 These instructions are implied mode, have a length of one byte and require two machine cycles.
 
@@ -77,50 +79,36 @@ SED (SEt Decimal)              $F8
 """
 
 
-class CLCInstruction(Instruction):
-    instruction_length = 1
-
+class CLC(Instruction):
     def execute(self, cpu):
         cpu.p_reg.carry_bit = False
 
 
-class SECInstruction(Instruction):
-    instruction_length = 1
-
+class SEC(Instruction):
     def execute(self, cpu):
         cpu.p_reg.carry_bit = True
 
 
-class CLIInstruction(Instruction):
-    instruction_length = 1
-
+class CLI(Instruction):
     def execute(self, cpu):
         cpu.p_reg.interrupt_bit = False
 
 
 class SEI(Instruction):
-
     def execute(self, cpu):
-        print("entre desde la matriz")
         cpu.p_reg.interrupt_bit = True
 
 
-class CLVInstruction(Instruction):
-    instruction_length = 1
-
+class CLV(Instruction):
     def execute(self, cpu):
         cpu.p_reg.overflow_bit = False
 
 
-class CLDInstruction(Instruction):
-    instruction_length = 1
-
+class CLD(Instruction):
     def execute(self, cpu):
         cpu.p_reg.decimal_bit = False
 
 
-class SEDInstruction(Instruction):
-    instruction_length = 1
-
+class SED(Instruction):
     def execute(self, cpu):
         cpu.p_reg.decimal_bit = True
