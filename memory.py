@@ -15,7 +15,7 @@ class MemoryOwnerMixin(ABC):
     def get_memory(self) -> List[bytes]:
         pass
 
-    def get(self, position: int) -> int:
+    def get(self, position: int) -> str:
             return self.get_memory()[position - self.memory_start_location]
 
     def set(self, position, value: bytes):

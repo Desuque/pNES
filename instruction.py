@@ -1,3 +1,4 @@
+# Que se acaben los vivos, los idiotas, el hambre, o esta politica, que es mas o menos lo mismo y ya no da para mas
 from abc import ABC, abstractmethod
 
 
@@ -8,59 +9,41 @@ class Instruction(ABC):
         pass
 
 
-# ADC (ADd with Carry)
-
-class ADCInmInstruction(Instruction):
-    adc_inst = [
-"""
-Affects Flags: S V Z C
-
-MODE           SYNTAX       HEX LEN TIM
-Immediate     ADC #$44      $69  2   2
-Zero Page     ADC $44       $65  2   3
-Zero Page,X   ADC $44,X     $75  2   4
-Absolute      ADC $4400     $6D  3   4
-Absolute,X    ADC $4400,X   $7D  3   4+
-Absolute,Y    ADC $4400,Y   $79  3   4+
-Indirect,X    ADC ($44,X)   $61  2   6
-Indirect,Y    ADC ($44),Y   $71  2   5+
-
-+ add 1 cycle if page boundary crossed
-"""
-    ]
-
-    # TODO: Instruction length
+class BPL(Instruction):
     def execute(self, cpu):
-        # TODO: Overflow in bit 7, to code carry flag
-        if cpu.a_reg_is_zero():
-            cpu.p_reg.zero_bit = True
-
-        # TODO: Overflow flag, negative flag
+        if cpu.p_reg.negative_bit == 0:
+            cpu.pc_reg = cpu.address
+            cpu.add_branch_cycle()
 
 
-class LDAInmInstruction(Instruction):
-    instruction_length = 2
-
+class LDX(Instruction):
     def execute(self, cpu):
-        cpu.a_reg = cpu.address
-
-        if cpu.a_reg_is_zero():
-            cpu.p_reg.zero_bit = True
-
-        if cpu.a_reg_is_negative():
-            cpu.p_reg.negative_bit = True
+        cpu.x_reg = cpu.read(cpu.address)
+        cpu.set_z(cpu.x_reg)
+        cpu.set_n(cpu.x_reg)
 
 
-class STAAbsInstruction(Instruction):
-
+class TXS(Instruction):
     def execute(self, cpu):
-        memory_address = int.from_bytes(cpu.address, byteorder='little')
-        value_to_store = cpu.a_reg
+        cpu.sp_reg = cpu.x_reg
+
+
+class LDA(Instruction):
+    def execute(self, cpu):
+        cpu.a_reg = cpu.read(cpu.address)
+        cpu.set_z(cpu.a_reg)
+        cpu.set_n(cpu.a_reg)
+
+
+class STA(Instruction):
+    def execute(self, cpu):
+        memory_address = int.from_bytes(cpu.read(cpu.address), byteorder='little')
+        value_to_store = int.from_bytes(cpu.a_reg, byteorder='little')
 
         memory_owner = cpu.get_memory_owner(memory_address)
         memory_owner.set(memory_address, value_to_store)
 
-        print(memory_address)
+        print(cpu.ram.memory[0])
 
 # Status instructions
 
@@ -112,3 +95,100 @@ class CLD(Instruction):
 class SED(Instruction):
     def execute(self, cpu):
         cpu.p_reg.decimal_bit = True
+
+# Illegal opcodes
+
+
+class AHX(Instruction):
+    def execute(self, cpu):
+        print("Illegal opcode: {}".format(self.__class__.__name__))
+
+
+class ALR(Instruction):
+    def execute(self, cpu):
+        print("Illegal opcode: {}".format(self.__class__.__name__))
+
+
+class ANC(Instruction):
+    def execute(self, cpu):
+        print("Illegal opcode: {}".format(self.__class__.__name__))
+
+
+class ARR(Instruction):
+    def execute(self, cpu):
+        print("Illegal opcode: {}".format(self.__class__.__name__))
+
+
+class AXS(Instruction):
+    def execute(self, cpu):
+        print("Illegal opcode: {}".format(self.__class__.__name__))
+
+
+class DCP(Instruction):
+    def execute(self, cpu):
+        print("Illegal opcode: {}".format(self.__class__.__name__))
+
+
+class ISC(Instruction):
+    def execute(self, cpu):
+        print("Illegal opcode: {}".format(self.__class__.__name__))
+
+
+class KIL(Instruction):
+    def execute(self, cpu):
+        print("Illegal opcode: {}".format(self.__class__.__name__))
+
+
+class LAS(Instruction):
+    def execute(self, cpu):
+        print("Illegal opcode: {}".format(self.__class__.__name__))
+
+
+class LAX(Instruction):
+    def execute(self, cpu):
+        print("Illegal opcode: {}".format(self.__class__.__name__))
+
+
+class RLA(Instruction):
+    def execute(self, cpu):
+        print("Illegal opcode: {}".format(self.__class__.__name__))
+
+
+class RRA(Instruction):
+    def execute(self, cpu):
+        print("Illegal opcode: {}".format(self.__class__.__name__))
+
+
+class SAX(Instruction):
+    def execute(self, cpu):
+        print("Illegal opcode: {}".format(self.__class__.__name__))
+
+
+class SHX(Instruction):
+    def execute(self, cpu):
+        print("Illegal opcode: {}".format(self.__class__.__name__))
+
+
+class SHY(Instruction):
+    def execute(self, cpu):
+        print("Illegal opcode: {}".format(self.__class__.__name__))
+
+
+class SLO(Instruction):
+    def execute(self, cpu):
+        print("Illegal opcode: {}".format(self.__class__.__name__))
+
+
+class SRE(Instruction):
+    def execute(self, cpu):
+        print("Illegal opcode: {}".format(self.__class__.__name__))
+
+
+class TAS(Instruction):
+    def execute(self, cpu):
+        print("Illegal opcode: {}".format(self.__class__.__name__))
+
+
+class XAA(Instruction):
+    def execute(self, cpu):
+        print("Illegal opcode: {}".format(self.__class__.__name__))
